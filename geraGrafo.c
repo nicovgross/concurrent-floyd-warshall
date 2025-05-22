@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-int pesoMax = 15;
-int pesoMin = -15;
+int pesoMax = 20;
+int pesoMin = 0;
 #define INF 1000000000
 
 void geraGrafo(int V, int E, int *adjacencia) {
