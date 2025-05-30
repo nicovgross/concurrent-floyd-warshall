@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "leGrafo.h"
- 
-#define INF 1000000000
 
 void imprime_matriz_adjacencia(int V, int *adjacencia) {
     int indice, peso;
@@ -10,16 +8,20 @@ void imprime_matriz_adjacencia(int V, int *adjacencia) {
         for(int j=0; j<V; j++) {
             indice = i*V + j;
             peso = adjacencia[indice];
-            if(peso == INF) { printf("INF "); }
+            if(peso >= 1000000000) { printf("INF "); }
             else { printf("%d ", peso); } 
         }
         printf("\n");
     }
 }
 
-void imprime_grafo(int V, int E, int *adjacencia) {
+void imprime_dimensoes(int V, int E) {
     printf("Vertices: %d\n", V);
     printf("Arestas: %d\n\n", E);
+}
+
+void imprime_grafo(int V, int E, int *adjacencia) {
+    imprime_dimensoes(V, E);
     //imprime a matriz na saida padrao
     printf("Matriz de adjacencia:\n");
     imprime_matriz_adjacencia(V, adjacencia);
