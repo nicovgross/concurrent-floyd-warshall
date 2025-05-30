@@ -14,9 +14,9 @@ int nthreads;
 pthread_mutex_t mutex;
 pthread_cond_t cond;
 
-//copia a matriz 1 para a matriz 2, considerando euq elas foram devidamente alocadas
+//copia a matriz 1 para a matriz 2, considerando que elas foram devidamente alocadas
 void copia_matriz(int *matriz1, int *matriz2, int dim) {
-    for(int i=0; i<dim; i++) {
+    for(int i=0; i<(dim*dim); i++) {
         matriz2[i] = matriz1[i];
     }
 }
@@ -50,7 +50,7 @@ void* Floyd_Warshall(void *arg) {
             }
         }
         barreira(nthreads);
-        dist_prev = dist_curr;
+        copia_matriz(dist_curr, dist_prev, V);
     }
 }
 
@@ -72,11 +72,12 @@ int main(int argc, char* argv[]) {
     }
 
     leGrafo(&dist_curr, &V, &E, argv[2]);
-    /*imprime_grafo(V, E, dist_curr);
+    printf("Matriz de entrada:\n\n");
+    imprime_grafo(V, E, dist_curr);
+    printf("\n\n");
     dist_prev = (int*) malloc(sizeof(int) * V*V);
     copia_matriz(dist_curr, dist_prev, V);
-    imprime_grafo(V, E, dist_prev);*/
-
+    
     //Cria as threads
     for(int id=0; id<nthreads; id++) {
         pthread_create(&tid[id], NULL, Floyd_Warshall, (void*)(intptr_t)id);
@@ -89,7 +90,8 @@ int main(int argc, char* argv[]) {
         } 
     } 
 
-    //imprime_grafo(V, E, dist_curr);
+    printf("Matriz de saída:\n\n");
+    imprime_grafo(V, E, dist_curr);
 
     //Espera todas as threads completarem
     free(tid);
