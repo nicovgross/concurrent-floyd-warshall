@@ -4,14 +4,13 @@
 
 int pesoMax = 20;
 int pesoMin = 0;
-#define INF 1000000000
 
 void geraGrafo(int V, int E, int *adjacencia) {
     int total = V * V;
 
     // Inicializa todas as posições com INF
     for (int i = 0; i < total; i++) {
-        adjacencia[i] = INF;
+        adjacencia[i] = 1000000000;
     }
 
     // Define distância 0 para as autoarestas
@@ -19,6 +18,7 @@ void geraGrafo(int V, int E, int *adjacencia) {
         adjacencia[i * V + i] = 0;
     }
 
+    srand(time(NULL));
     // Gera E arestas aleatórias
     int arestasCriadas = 0;
     while (arestasCriadas < E) {
@@ -27,7 +27,7 @@ void geraGrafo(int V, int E, int *adjacencia) {
         int v = rand() % V;
 
         // evita autoarestas duplicadas e sobreposição de arestas
-        if (u != v && adjacencia[u * V + v] == INF) {
+        if (u != v && adjacencia[u * V + v] >= 1000000000) {
             int peso = (rand() % (pesoMax - pesoMin + 1)) + pesoMin;
             adjacencia[u * V + v] = peso;
             arestasCriadas++;
