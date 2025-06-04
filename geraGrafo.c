@@ -45,8 +45,14 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Digite: %s <vertices> <arestas> <arquivo saida>\n", argv[0]);
         return 1;
     }
-    V = atoi(argv[1]); //lê o número de vértices
-    E = atoi(argv[2]); //lê o número de arestas
+    /*
+        argv[1] -> número de vértices do grafo
+        argv[2] -> número de arestas do grafo
+        argv[3] -> nome do arquivo de saída
+    */
+
+    V = atoi(argv[1]); 
+    E = atoi(argv[2]); 
     adjacencia = (int*) malloc(sizeof(int) * V*V); //aloca espaço para a matriz de adjacência
     if(!adjacencia) {
         fprintf(stderr, "Erro de alocao da memoria da matriz\n");
