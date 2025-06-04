@@ -42,21 +42,22 @@ Algoritmo do Floyd-Warshall
 Recebe o id da thread e com base nisso calcula as respectivas linhas da matriz de distância,
 sempre consultando a matriz de distâncias da iteração anterior para calcular os valores da matriz atual
 */
+
 void* Floyd_Warshall(void *arg) {
     int id = (intptr_t) arg;
     
     for(int k=0; k<V; k++) {
         for(int i=id; i<V; i+=nthreads) {
             for(int j=0; j<V; j++) {
-                pthread_mutex_lock(&mutex);
                 if(dist_prev[i*V + j] > dist_prev[i*V + k] + dist_prev[k*V + j]) {
                     dist_curr[i*V + j] = dist_curr[i*V + k] + dist_curr[k*V + j];
                 }
-                pthread_mutex_unlock(&mutex);
             }
         }
         barreira(nthreads);
-        copia_matriz(dist_curr, dist_prev, V);
+        int* temp = dist_prev;
+        dist_prev = dist_curr;
+        dist_curr = temp;
     }
 }
 
@@ -106,7 +107,13 @@ int main(int argc, char* argv[]) {
     arq = fopen(argv[3], "wb");
     if(!arq) { fprintf(stderr, "Erro de abertura do arquivo de saída\n"); return 3; }
 
-    ret = fwrite(&temp_exec, sizeof(int), 1, arq);
+    ret = fwrite(&temp_exec, sizeof(double), 1, arq);
+    if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
+    ret = fwrite(&nthreads, sizeof(int), 1, arq);
+    if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
+    ret = fwrite(&V, sizeof(int), 1, arq);
+    if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
+    ret = fwrite(&E, sizeof(int), 1, arq);
     if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
     ret = fwrite(dist_curr, sizeof(int), V*V, arq);
     if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
