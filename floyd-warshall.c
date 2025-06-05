@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <string.h>
 #include <time.h>
 #include "leGrafo.h"
 
@@ -15,11 +16,8 @@ int nthreads; //número de threads
 pthread_mutex_t mutex;
 pthread_cond_t cond;
 
-//copia a matriz 1 para a matriz 2, considerando que elas foram devidamente alocadas
-void copia_matriz(int *matriz1, int *matriz2, int dim) {
-    for(int i=0; i<(dim*dim); i++) {
-        matriz2[i] = matriz1[i];
-    }
+void copia_matriz(int *src, int *dest, int n) {
+    memcpy(dest, src, n * n * sizeof(int));
 }
 
 //funcao barreira
@@ -55,19 +53,19 @@ void* Floyd_Warshall(void *arg) {
             }
         }
         barreira(nthreads);
-        int* temp = dist_prev;
-        dist_prev = dist_curr;
-        dist_curr = temp;
+        copia_matriz(dist_curr, dist_prev, V);
     }
 }
 
 int main(int argc, char* argv[]) {
     pthread_t *tid;
+    int *adjacencia; //matriz de adjacencia do grafo
     struct timespec inicio, fim;
-    double temp_exec;
+    double temp_exec, temp_medio;
     FILE *arq;
     size_t ret;
 
+    //inicia as variáveis de sincronização
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init (&cond, NULL);
 
@@ -75,39 +73,48 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Digite: %s <numero de threads> <arquivo de entrada> <arquivo de saída>\n", argv[0]);
         return 1;
     }
-    nthreads = atoi(argv[1]);
+    nthreads = atoi(argv[1]); //lê o número de threads
     tid = (pthread_t*) malloc(sizeof(pthread_t) * nthreads);
     if (tid == NULL) {
         fprintf(stderr, "Erro: Falha na alocação de memória para as threads.\n");
         return 2;
     }
 
-    leGrafo(&dist_curr, &V, &E, argv[2]); //lê o grafo do arquivo de entrada
+    leGrafo(&adjacencia, &V, &E, argv[2]); //lê o grafo do arquivo de entrada
+    dist_curr = (int*) malloc(sizeof(int) * V*V);
     dist_prev = (int*) malloc(sizeof(int) * V*V);
-    copia_matriz(dist_curr, dist_prev, V);
-    
-    clock_gettime(CLOCK_MONOTONIC, &inicio);
 
-    //Cria as threads
-    for(int id=0; id<nthreads; id++) {
-        pthread_create(&tid[id], NULL, Floyd_Warshall, (void*)(intptr_t)id);
-    }
+    for(int i=0; i<5; i++) {
+        //antes do algoritmo começar as matrizes de distancia vão ser iguais a de adjacência
+        copia_matriz(adjacencia, dist_curr, V);
+        copia_matriz(adjacencia, dist_prev, V);
 
-    //Espera todas as threads completarem
-    for (int id=0; id<nthreads; id++) {
-        if (pthread_join(tid[id], NULL)) {
-            printf("--ERRO: pthread_join() \n"); 
-            exit(-1); 
-        } 
+        clock_gettime(CLOCK_MONOTONIC, &inicio);
+        //Cria as threads
+        for(int id=0; id<nthreads; id++) {
+            pthread_create(&tid[id], NULL, Floyd_Warshall, (void*)(intptr_t)id);
+        }
+
+        //Espera todas as threads completarem
+        for (int id=0; id<nthreads; id++) {
+            if (pthread_join(tid[id], NULL)) {
+                printf("--ERRO: pthread_join() \n"); 
+                exit(-1); 
+            } 
+        }
+
+        clock_gettime(CLOCK_MONOTONIC, &fim);
+        temp_exec = (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec) / 1e9;
+        temp_medio += temp_exec;
     } 
 
-    clock_gettime(CLOCK_MONOTONIC, &fim);
-    temp_exec = (fim.tv_sec - inicio.tv_sec) + (fim.tv_nsec - inicio.tv_nsec) / 1e9;
+    temp_medio /= 5; //calcula o tempo de execução médio
 
+    //Escreve todas as informações da execução do programa em um arquivo binário
     arq = fopen(argv[3], "wb");
     if(!arq) { fprintf(stderr, "Erro de abertura do arquivo de saída\n"); return 3; }
 
-    ret = fwrite(&temp_exec, sizeof(double), 1, arq);
+    ret = fwrite(&temp_medio, sizeof(double), 1, arq);
     if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
     ret = fwrite(&nthreads, sizeof(int), 1, arq);
     if(!ret) { fprintf(stderr, "Erro na escrita do arquivo de saída\n"); return 4; }
