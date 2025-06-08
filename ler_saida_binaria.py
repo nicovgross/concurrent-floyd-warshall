@@ -24,3 +24,22 @@ def ler_arquivo_binario(caminho_arquivo):
 
         return temp_exec, nthreads, V, E, dist_matrix
     
+    
+def ler_matriz_adjacencia_binario(caminho_arquivo):
+    with open(caminho_arquivo, 'rb') as f:
+        # Lê o número de vértices (V) e arestas (E)
+        V = struct.unpack('i', f.read(4))[0]
+        E = struct.unpack('i', f.read(4))[0]
+
+        # Lê a matriz de adjacência (V*V inteiros)
+        matriz_bytes = f.read(4 * V * V)
+        matriz_flat = struct.unpack(f'{V * V}i', matriz_bytes)
+        matriz = np.array(matriz_flat, dtype=float).reshape((V, V))
+
+        # Substitui 0 por infinito (exceto na diagonal)
+        for i in range(V):
+            for j in range(V):
+                if i != j and matriz[i][j] == 0:
+                    matriz[i][j] = np.inf
+
+    return V, matriz

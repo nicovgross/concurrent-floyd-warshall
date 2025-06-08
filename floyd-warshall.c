@@ -43,18 +43,27 @@ sempre consultando a matriz de distâncias da iteração anterior para calcular 
 
 void* Floyd_Warshall(void *arg) {
     int id = (intptr_t) arg;
-    
-    for(int k=0; k<V; k++) {
-        for(int i=id; i<V; i+=nthreads) {
-            for(int j=0; j<V; j++) {
-                if(dist_prev[i*V + j] > dist_prev[i*V + k] + dist_prev[k*V + j]) {
-                    dist_curr[i*V + j] = dist_curr[i*V + k] + dist_curr[k*V + j];
+
+    for (int k = 0; k < V; k++) {
+        for (int i = id; i < V; i += nthreads) {
+            for (int j = 0; j < V; j++) {
+                int ik = dist_prev[i * V + k];
+                int kj = dist_prev[k * V + j];
+                int ij = dist_prev[i * V + j];
+
+                // Relaxa se possível
+                if (ik < 1000000000 && kj < 1000000000 && ij > ik + kj) {
+                    dist_curr[i * V + j] = ik + kj;
+                } else {
+                    dist_curr[i * V + j] = ij; 
                 }
             }
         }
+
         barreira(nthreads);
         copia_matriz(dist_curr, dist_prev, V);
     }
+    return NULL;
 }
 
 int main(int argc, char* argv[]) {
@@ -68,6 +77,12 @@ int main(int argc, char* argv[]) {
     //inicia as variáveis de sincronização
     pthread_mutex_init(&mutex, NULL);
     pthread_cond_init (&cond, NULL);
+
+    /*
+        argv[1] -> número de threads
+        argv[2] -> nome do arquivo de entrada
+        argv[3] -> nome do arquivo de saída
+    */
 
     if(argc < 4) {
         fprintf(stderr, "Digite: %s <numero de threads> <arquivo de entrada> <arquivo de saída>\n", argv[0]);
