@@ -3,7 +3,7 @@
 #include <time.h>
 
 int pesoMax = 20;
-int pesoMin = 0;
+int pesoMin = 1;
 
 void geraGrafo(int V, int E, int *adjacencia) {
     int total = V * V;
