@@ -32,15 +32,8 @@ def main():
     diferenca[mask] = matriz_scipy[mask] - matriz_usuario_dist[mask]
     frob = np.linalg.norm(diferenca, 'fro')
 
-    print(f"Norma de Frobenius da diferença: {frob:.8f}")
-    print("Máxima diferença absoluta (ignorando inf):", np.max(np.abs(diferenca[mask])))
-    
-    print("Trecho da matriz scipy:")
-    print(matriz_scipy[18:24, 18:24])
-    print("Trecho da matriz de dist do usuário:")
-    print(matriz_usuario_dist[18:24, 18:24])
-    print("Trecho da diferença:")
-    print(diferenca[18:24, 18:24])
+    print(f"Norma de Frobenius da diferença: {frob**2:.8f}")
+    print("Máxima diferença absoluta: ", np.max(np.abs(diferenca[mask])))
 
 if __name__ == "__main__":
     main()
