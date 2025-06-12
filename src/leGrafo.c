@@ -62,5 +62,5 @@ int leGrafo(int **adjacencia, int *V, int *E, char *file) {
     }
 
     fclose(arq);
+    return 0;
 }
- 
