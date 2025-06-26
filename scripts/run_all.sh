@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# Paths
-GRAPH_DIR="grafos_testes"
-RESULTS_DIR="resultados"
-EXECUTABLE="./fw"
+# Get directory of this script and resolve project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Paths (relative to project root)
+GRAPH_DIR="$ROOT_DIR/data/grafos_testes"
+RESULTS_DIR="$ROOT_DIR/data/resultados"
+EXECUTABLE="$ROOT_DIR/bin/floyd-warshall"
 
 # Thread configurations
 THREADS=(1 2 4 8)
