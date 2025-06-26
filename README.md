@@ -38,7 +38,15 @@ Gera um grafo com ```<V>``` vértices e ```<E>``` arestas, salvando no arquivo d
 Executa o algoritmo com ```<nthreads>``` threads, lendo o grafo de entrada e salvando os resultados da execução no arquivo de saída.
 
 ### Execução Automática dos Testes
+Após ter rodado o make, na pasta "./scripts", rode:
 ```bash
+chmod +x run_all.sh
+./run_all.sh
+```
+Talvez seja necessário rodar ``sed -i 's/\r$//' run_all.sh`` antes do ``chmod`` em sistemas Unix, tal que:
+```bash
+sed -i 's/\r$//' run_all.sh
+chmod +x run_all.sh
 ./run_all.sh
 ```
 Executa todos os testes de desempenho automaticamente, com diferentes números de threads, e gera gráficos de comparação, salvando na pasta ```assets```.
