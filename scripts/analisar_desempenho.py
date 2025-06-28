@@ -69,7 +69,7 @@ def processar_resultados(pasta_resultados, pasta_assets):
         print(f"[✓] Plots salvos em {pasta_saida}")
 
 # Caminhos
-PASTA_RESULTADOS = 'resultados'
+PASTA_RESULTADOS = 'data/resultados'
 PASTA_ASSETS = 'assets'
 
 # Executa
